@@ -1,0 +1,27 @@
+{
+  "name": "zf-ksh-bx",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "zf-ksh-bx": "./bin/c.js"
+  },
+  "author": "",
+  "repository": "https://gitee.com/caoyuanye/zf-ksh-bx.git",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.24.0",
+    "commander": "^8.3.0",
+    "docx-templates": "^4.8.2",
+    "exceljs": "^4.3.0",
+    "moment": "^2.29.1",
+    "node-xlsx": "^0.15.0",
+    "qs": "^6.10.1",
+    "xlsx": "^0.14.4",
+    "xlsx-style": "^0.8.13"
+  },
+  "devDependencies": {}
+}
