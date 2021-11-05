@@ -16,6 +16,7 @@ let resultImage = []
 let cantOCRImg = []
 let totalPrice = 0
 
+//判断截图支付方式
 function ckeckPayType(words_result) {
     if (words_result.find(function (item) {
         return item.words === 'AA收款'||item.words === '商家订单号'
@@ -58,13 +59,7 @@ async function parseDataAfter(parseData) {
     }
 
 }
-
-(async () => {
-
-
-
-})()
-
+//TODO 有空把错误处理跟提示加上
 module.exports=async (cmdPath,keyCache)=>{
     api_key=keyCache.api_key
     secret_key=keyCache.secret_key
@@ -87,7 +82,7 @@ module.exports=async (cmdPath,keyCache)=>{
     let dirs = fs.readdirSync(FILE_PATH)
     for (const dir of dirs.filter(dir=>fs.statSync(dir).isDirectory())) {
         let dirsFile = fs.readdirSync(FILE_PATH + '/' + dir)
-        //过滤打车
+        //过滤打车..打车票千奇百怪
         for (const file of dirsFile.filter(file=>file.indexOf('车')===-1)) {
             let img = fs.readFileSync(`${FILE_PATH}/${dir}/${file}`)
             console.log(`查询${file}`);
@@ -136,6 +131,7 @@ module.exports=async (cmdPath,keyCache)=>{
         }
     }
     let rows = []
+    //公司报销需要按照时间来进行排序
     const _resultDataTempCache = Object.keys(resultDataTemp).sort((a, b) => moment(a) - moment(b))
     for (const key of _resultDataTempCache) {
         const index = _resultDataTempCache.indexOf(key);
@@ -171,6 +167,7 @@ module.exports=async (cmdPath,keyCache)=>{
         docxData.push(_tem)
         _docxData.push(resultImageItem)
     }
+    //word插件限制，不能插入空图，所以找了个空白图片作假
     let emptySize = DOCX_IMAGE_SIZE - docxData.length % DOCX_IMAGE_SIZE
     for (let i = 0; i < emptySize; i++) {
         docxData.push(EMPTY_BASE64)
@@ -178,7 +175,6 @@ module.exports=async (cmdPath,keyCache)=>{
     docxData = chunk(docxData, DOCX_IMAGE_SIZE)
     const docxBuffer = await createReport({
         template: docxTemplate,
-        // output: './test.docx',
         data: {
             userImg: docxData
         },

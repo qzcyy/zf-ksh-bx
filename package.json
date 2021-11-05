@@ -9,7 +9,7 @@
   "bin": {
     "zf-ksh-bx": "./bin/c.js"
   },
-  "keywords":"zf-ksh-bx",
+  "keywords": "zf-ksh-bx",
   "author": "qzcyy",
   "repository": "https://gitee.com/caoyuanye/zf-ksh-bx.git",
   "license": "GUN2",
