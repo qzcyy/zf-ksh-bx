@@ -1,6 +1,6 @@
 {
   "name": "zf-ksh-bx",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -9,9 +9,10 @@
   "bin": {
     "zf-ksh-bx": "./bin/c.js"
   },
-  "author": "",
+  "keywords":"zf-ksh-bx",
+  "author": "qzcyy",
   "repository": "https://gitee.com/caoyuanye/zf-ksh-bx.git",
-  "license": "ISC",
+  "license": "GUN2",
   "dependencies": {
     "axios": "^0.24.0",
     "commander": "^8.3.0",
@@ -22,6 +23,9 @@
     "qs": "^6.10.1",
     "xlsx": "^0.14.4",
     "xlsx-style": "^0.8.13"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
   },
   "devDependencies": {}
 }
