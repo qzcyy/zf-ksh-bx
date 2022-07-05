@@ -15,7 +15,7 @@ let resultData = [];
 let resultImage = []
 let cantOCRImg = []
 let totalPrice = 0
-
+let payInfo={}
 //判断截图支付方式
 function ckeckPayType(words_result) {
     if (words_result.find(function (item) {
@@ -49,13 +49,18 @@ function chunk(item, size) {
 async function parseDataAfter(parseData) {
     //只报销30
     parseData.price=parseData.price>30?30:parseData.price
-    parseData.showTime = parseData.time.slice(0, 10)
+    parseData.showTime = parseData.time.slice(0, 10).trim()
     resultDataTemp[parseData.showTime] = resultDataTemp[parseData.showTime] || []
     if (!resultDataTemp[parseData.showTime].find(function (item) {
-        return item.time === parseData.time && item.price === parseData.price
+        return item.time === parseData.time && item.price === parseData.price&& item.owner === parseData.owner
     })) {
         totalPrice += parseData.price
         resultDataTemp[parseData.showTime].push(parseData)
+        if(payInfo&&payInfo[parseData.owner]){
+            payInfo[parseData.owner]+=parseData.price
+        }else {
+            payInfo[parseData.owner]=parseData.price
+        }
     }
 
 }
@@ -74,7 +79,11 @@ module.exports=async (cmdPath,keyCache)=>{
 
     await workbook.xlsx.readFile(path.join(__dirname+'/template/月加班餐费明细表.xlsx'));
     const worksheet = workbook.getWorksheet('招待');
+    let aaa=[{a:1},{a:2}]
+    for (const item of aaa) {
+        const index = aaa.indexOf(item);
 
+    }
 
     let {data: authData} = await baiduSdk.getAuth(api_key, secret_key)
     let {access_token} = authData
@@ -90,18 +99,16 @@ module.exports=async (cmdPath,keyCache)=>{
                 image: img.toString('base64')
             })
             let words_result = body.words_result
+            console.log(words_result);
             if (ckeckPayType(words_result) === 'zfb') {
                 //支付宝
                 let parseData = {
                     price: Math.abs(words_result[words_result.findIndex(function (item) {
                         return item.words == '付款方式'
                     }) - 2].words),
-                    time: words_result[words_result.findIndex(function (item) {
+                    time: (words_result[words_result.findIndex(function (item) {
                         return item.words == '创建时间'
-                    }) + 1].words.replace('年','-').replace('月','-').replace('日',''),
-                    // orderNo: words_result[words_result.findIndex(function (item) {
-                    //     return item.words == '订单号'
-                    // }) + 1].words,
+                    }) + 1].words).replace('年','-').replace('月','-').replace('日',''),
                     type: 'zfb',
                     local: file,
                     owner: dir
@@ -109,14 +116,23 @@ module.exports=async (cmdPath,keyCache)=>{
                 await parseDataAfter(parseData)
 
             } else if (ckeckPayType(words_result) === 'wechart') {
-                //微信
+                let _time=words_result[words_result.findIndex(function (item) {
+                    return item.words == '支付时间'||item.words == '转账时间'
+                }) + 1].words
+                let timeLast=words_result[words_result.findIndex(function (item) {
+                    return item.words == '支付时间'||item.words == '转账时间'
+                }) + 2]
+                if(!isNaN(timeLast.words.slice(0, 1))){
+                    _time=_time+timeLast.words
+                }
+                if(_time.indexOf('月')-_time.indexOf('年')===2){
+                    _time=_time.replace('年','年0')
+                }
                 let parseData = {
                     price: Math.abs(words_result[words_result.findIndex(function (item) {
                         return item.words == '当前状态'
                     }) - 1].words),
-                    time: words_result[words_result.findIndex(function (item) {
-                        return item.words == '支付时间'
-                    }) + 1].words.replace('年','-').replace('月','-').replace('日',''),
+                    time: _time.replace('年','-').replace('月','-').replace('日',' ').trim(),
                     // orderNo: words_result[words_result.findIndex(function (item) {
                     //     return item.words == '订单号'
                     // }) + 1].words,
@@ -131,6 +147,7 @@ module.exports=async (cmdPath,keyCache)=>{
         }
     }
     let rows = []
+    console.log(JSON.stringify(resultDataTemp));
     //公司报销需要按照时间来进行排序
     const _resultDataTempCache = Object.keys(resultDataTemp).sort((a, b) => moment(a) - moment(b))
     for (const key of _resultDataTempCache) {
@@ -196,5 +213,8 @@ module.exports=async (cmdPath,keyCache)=>{
         }
         console.log(cantOCRImg);
         console.error('存在未识别图片，请人工分配')
+    }
+    if(payInfo){
+        fs.writeFileSync(`转账明细.txt`,JSON.stringify(payInfo),'utf-8')
     }
 }
