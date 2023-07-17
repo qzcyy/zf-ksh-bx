@@ -1,6 +1,6 @@
 {
   "name": "zf-ksh-bx",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -11,7 +11,7 @@
   },
   "keywords": "zf-ksh-bx",
   "author": "qzcyy",
-  "repository": "https://gitee.com/caoyuanye/zf-ksh-bx.git",
+  "repository": "https://github.com/qzcyy/zf-ksh-bx.git",
   "license": "GUN2",
   "dependencies": {
     "axios": "^0.24.0",
